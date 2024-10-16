@@ -1,6 +1,8 @@
 import User from "../schema/userSchema.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
     try {
@@ -68,6 +70,106 @@ export const logOut = async (req, res) => {
             message:"Logged Out Successfully",
             success:true
         });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Internal Server Error", success : false});
+    }
+}
+
+export const getProfile  = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        return res.status(200).json({
+            message: "Profile Retrieved Successfully",
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Internal Server Error", success : false});
+    }
+}
+
+export const editProfile = async (req, res) => {
+    try {
+        const userId = req.id;
+        const {bio, gender} = req.body;
+        const profilePicture = req.file;
+
+        let cloudResponse;
+        if(profilePicture){
+            const fileUri = getDataUri(profilePicture);
+            cloudResponse = await cloudinary.uploader.upload(fileUri);
+        }
+        let picUrl = cloudResponse.secure_url || 'https://th.bing.com/th?id=OIP.Z306v3XdxhOaxBFGfHku7wHaHw&w=244&h=255&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2';
+
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({message: "User Not Found", success : false});
+        }
+        if(bio) user.bio = bio;
+        if(gender) user.gender = gender;
+        if(profilePicture) user.profilePicture = picUrl;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Profile Updated Successfully",
+            success: true,
+            user
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Internal Server Error", success : false});
+    }
+}
+export const getSuggestedUser = async (req, res) => {
+    try {
+        const suggestedUsers = await User.find({_id:{$ne:req.id}}).select("-password");
+        if(!suggestedUsers){
+            return res.status(404).json({message: "User Not Found", success : false});
+        }
+        return res.status(201).json({message:"Users Found", success:true, users : suggestedUsers});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Internal Server Error", success : false});
+    }
+}
+export const followOrUnfollow = async (req, res) => {
+    try {
+        const user1 = req.id; //follow karne wala
+        const user2 = req.params.id; // person whom user1 is following
+        if(user1 === user2){
+            return res.status(400).json({message: "You can't follow yourself", success :false});
+        }
+
+        const user = await User.findById(user1);
+        const targetUser = await User.findById(user2);
+
+        if(!user || !targetUser){
+            return res.status(404).json({message: "User Not Found", success : false});
+        }
+
+        //checking following or not
+        const isFollowing = user.following.includes(user2);
+        if(isFollowing){
+            //unfollowing logic
+            await Promise.all([
+                User.updateOne({_id:user1},{$pull: {following: user2}}),
+                User.updateOne({_id:user2},{$pull: {followers: user1}}),
+            ]);
+            return res.status(200).json({message:"Unfollowed Successfully", success:true});
+        } else {
+            //following logic
+            await Promise.all([
+                User.updateOne({_id:user1},{$push: {following: user2}}),
+                User.updateOne({_id:user2},{$push: {followers: user1}}),
+            ]);
+            return res.status(200).json({message:"Followed Successfully", success:true});
+        }
+
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({message: "Internal Server Error", success : false});

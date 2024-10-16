@@ -2,6 +2,7 @@ import express, { urlencoded } from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
+import connectDB from './utils/db.js';
 dotenv.config();
 
 const app = express();
@@ -15,6 +16,8 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 
+const PORT = process.env.PORT || 3000;
 app.listen(() => {
-    console.log(`Server is running on PORT ${process.env.PORT}`);
+    console.log(`Server is running on PORT ${PORT}`);
+    connectDB();
 });

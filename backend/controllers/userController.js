@@ -13,8 +13,11 @@ export const register = async (req, res) => {
         }
         const existingUser = await User.findOne({email});
         const existingUser2 = await User.findOne({username});
-        if(existingUser || existingUser2){
-            return res.status(401).json({message: "User or email already exist. Try Different", success : false});
+        if(existingUser){
+            return res.status(401).json({message: "Username already taken. Try something different", success : false});
+        }
+        if(existingUser2){
+            return res.status(401).json({message: "Email already taken. Try something different", success : false});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);

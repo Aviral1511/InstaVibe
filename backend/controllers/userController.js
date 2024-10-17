@@ -11,12 +11,13 @@ export const register = async (req, res) => {
             return res.status(401).json({message: "Please fill in all fields.", success : false});
         }
         const existingUser = await User.findOne({email});
-        if(existingUser){
-            return res.status(401).json({message: "Email already in use. Try Different", success : false});
+        const existingUser2 = await User.findOne({username});
+        if(existingUser || existingUser2){
+            return res.status(401).json({message: "User or email already exist. Try Different", success : false});
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({username, email, password: hashedPassword});
+        const user = await User.create({ username, email, password: hashedPassword});
         return res.status(201).json({message:"User Registered Successfully", success:true});
 
     } catch (error) {
@@ -79,7 +80,7 @@ export const logOut = async (req, res) => {
 export const getProfile  = async (req, res) => {
     try {
         const userId = req.params.id;
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("-password");
         return res.status(200).json({
             message: "Profile Retrieved Successfully",
             success: true,
@@ -98,19 +99,20 @@ export const editProfile = async (req, res) => {
         const profilePicture = req.file;
 
         let cloudResponse;
+        let picUrl = 'https://th.bing.com/th?id=OIP.Z306v3XdxhOaxBFGfHku7wHaHw&w=244&h=255&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2';
         if(profilePicture){
             const fileUri = getDataUri(profilePicture);
             cloudResponse = await cloudinary.uploader.upload(fileUri);
+            picUrl = cloudResponse.secure_url;
         }
-        let picUrl = cloudResponse.secure_url || 'https://th.bing.com/th?id=OIP.Z306v3XdxhOaxBFGfHku7wHaHw&w=244&h=255&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2';
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("-password");
         if(!user){
             return res.status(404).json({message: "User Not Found", success : false});
         }
         if(bio) user.bio = bio;
         if(gender) user.gender = gender;
-        if(profilePicture) user.profilePicture = picUrl;
+        user.profilePicture = picUrl;
         await user.save();
 
         return res.status(200).json({

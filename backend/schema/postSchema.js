@@ -5,10 +5,10 @@ const postSchema = new mongoose.Schema({
         type:String,
         default: '',
     },
-    images : [{
+    image : {
         type: String,
         required: true
-    }],
+    },
     author : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

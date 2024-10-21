@@ -1,15 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { setUser } from '@/redux/authSlice';
 import { USER_API_ENDPOINT } from '@/utils/ApiEndPoints';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Login = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [input, setInput] = useState({
         email: "",
@@ -33,6 +36,7 @@ const Login = () => {
                 withCredentials: true
             });
             if (res.data.success) {
+                dispatch(setUser(res.data.user));
                 navigate('/');
                 toast.success(res.data.message);
                 setInput({

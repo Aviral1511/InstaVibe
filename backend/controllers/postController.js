@@ -44,10 +44,10 @@ export const addNewPost = async (req, res) => {
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().sort({createdAt:-1})
-        .populate({path:'author', select:'username, profilePicture'})
+        .populate({path:'author', select:'username profilePicture'})
         .populate({path:'comments' , sort:{createdAt:-1}, populate : {
             path:'author',
-            select:'username, profilePicture'
+            select:'username profilePicture'
         }});
         return res.status(201).json({
             posts, success:true
@@ -62,10 +62,10 @@ export const getUserPosts = async (req, res) => {
     try {
         const authorId = req.id;
         const posts = await Post.find({author:authorId}).sort({createdAt:-1})
-        .populate({path:'author', select:'username, profilePicture'})
+        .populate({path:'author', select:'username profilePicture'})
         .populate({path:'comments' , sort:{createdAt:-1}, populate : {
             path:'author',
-            select:'username, profilePicture'
+            select:'username profilePicture'
         }});
         return res.status(201).json({
             posts, success:true
@@ -130,7 +130,7 @@ export const addComment = async (req, res) => {
             text, author : user, post : postId
         }).populate({
             path:'author',
-            select:'username, profilePicture'
+            select:'username profilePicture'
         });
         post.comments.push(comment._id);
         await post.save();
@@ -145,7 +145,7 @@ export const addComment = async (req, res) => {
 export const getCommentsofPost = async (req, res) => {
     try {
         const postId = req.params.id;
-        const comments  = await Comment.find({post:postId}).populate('author','username, profilePicture');
+        const comments  = await Comment.find({post:postId}).populate('author','username profilePicture');
 
         if(!comments) return res.status(404).json({message:"No comments found", success:false});
         

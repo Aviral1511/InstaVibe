@@ -2,35 +2,42 @@ import { USER_API_ENDPOINT } from '@/utils/ApiEndPoints'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import axios from 'axios'
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import { setUser } from '@/redux/authSlice'
+import CreatePost from './CreatePost'
 
-const items = [
-    { icon: <Home />, text: 'Home' },
-    { icon: <Search />, text: 'Search' },
-    { icon: <TrendingUp />, text: 'Explore' },
-    { icon: <MessageCircle />, text: 'Messages' },
-    { icon: <Heart />, text: 'Notifications' },
-    { icon: <PlusSquare />, text: 'Create' },
-    {
-        icon: (
-            <Avatar className='w-7 h-7'>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-        ), text: 'Profile'
-    },
-    { icon: <LogOut />, text: 'Logout' }
-
-]
 const LeftSidebar = () => {
     const navigate = useNavigate();
-
+    const {user} = useSelector(store=>store.auth);
+    const dispatch = useDispatch();
+    const [open, setOpen] = useState(false);
+    
+    const items = [
+        { icon: <Home />, text: 'Home' },
+        { icon: <Search />, text: 'Search' },
+        { icon: <TrendingUp />, text: 'Explore' },
+        { icon: <MessageCircle />, text: 'Messages' },
+        { icon: <Heart />, text: 'Notifications' },
+        { icon: <PlusSquare />, text: 'Create' },
+        {
+            icon: (
+                <Avatar className='w-7 h-7'>
+                    <AvatarImage src={user?.profilePicture} alt="@shadcn" />
+                    <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+            ), text: 'Profile'
+        },
+        { icon: <LogOut />, text: 'Logout' }
+    
+    ]
     const logoutHandler = async () => {
         try {
             const res = await axios.get(`${USER_API_ENDPOINT}/logout`, {withCredentials:true});
             if(res.data.success){
+                dispatch(setUser(null));
                 toast.success(res.data.message);
                 navigate("/login");
             }
@@ -42,6 +49,7 @@ const LeftSidebar = () => {
 
     const sidebarHandler = (text) => {
         if(text === 'Logout') logoutHandler();
+        else if (text === 'Create') setOpen(true);
     }
 
     return (
@@ -60,8 +68,8 @@ const LeftSidebar = () => {
                         })
                     }
                 </div>
-
             </div>
+            <CreatePost open={open} setOpen={setOpen}/>
         </div>
     )
 }

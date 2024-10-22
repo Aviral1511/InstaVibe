@@ -18,7 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:id" element={<Profile />} />
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

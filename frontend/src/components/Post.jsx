@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { POST_API_ENDPOINT } from '@/utils/ApiEndPoints'
-import { setPosts } from '@/redux/postSlice'
+import { setPosts, setSelectedPost } from '@/redux/postSlice'
+import { Badge } from './ui/badge'
 
 const Post = ({post}) => {
     const [text, setText] = useState("");
@@ -99,7 +100,10 @@ const Post = ({post}) => {
                         <AvatarImage src={post?.author?.profilePicture} alt="@shadcn" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <h1>{post?.author?.username} </h1>
+                    <div className='flex items-center gap-2'>
+                        <h1>{post?.author?.username} </h1>
+                        {user?._id === post?.author?._id && <Badge variant={'secondary'}>Author</Badge>}
+                    </div>
                 </div>
                 <Dialog>
                     <DialogTrigger asChild>
@@ -121,7 +125,7 @@ const Post = ({post}) => {
                         liked ? <FaHeart size={'22px'} className='cursor-pointer text-red-600' onClick={likeDislikeHandler}/> : 
                         <FaRegHeart size={'22px'} className='cursor-pointer hover:text-gray-600' onClick={likeDislikeHandler}/>
                     }
-                    <MessageCircle onClick={() => setOpen(true)} className='cursor-pointer hover:text-gray-600' />
+                    <MessageCircle onClick={() => {dispatch(setSelectedPost(post)); setOpen(true)}} className='cursor-pointer hover:text-gray-600' />
                     <Send className='cursor-pointer hover:text-gray-600' />
                 </div>
                 <Bookmark className='cursor-pointer hover:text-gray-600' />
@@ -131,7 +135,10 @@ const Post = ({post}) => {
                 <span className='font-medium mr-2'>{post?.author?.username}</span>
                 {post?.caption}
             </p>
-            <span onClick={() => setOpen(true)} className='cursor-pointer text-sm text-gray-500' >View all {postComments.length} comments</span>
+            {
+                postComments.length > 0 && 
+                <span onClick={() => {dispatch(setSelectedPost(post)); setOpen(true)}} className='cursor-pointer text-sm text-gray-500' >View all {postComments.length} comments</span>
+            }
             <CommentDialog open={open} setOpen={setOpen}/>
             <div className='flex items-center justify-between my-2'>
                 <Input type="text" placeholder='Add a comment...' value={text} onChange={changeEventHandler} className='outline-none text-sm w-full mr-2'/>

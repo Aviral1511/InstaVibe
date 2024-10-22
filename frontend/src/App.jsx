@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import MainLayout from "./components/MainLayout";
 import HomePage from "./pages/HomePage";
 import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
 
@@ -19,6 +20,8 @@ function App() {
           <Route path="/" element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/account/edit" element={<EditProfile />} />
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

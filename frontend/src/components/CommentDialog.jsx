@@ -14,6 +14,7 @@ import { toast } from 'react-toastify'
 
 const CommentDialog = ({ open, setOpen }) => {
     const [text, setText] = useState("");
+    const {user} = useSelector(store=>store.auth);
     const {selectedPost} = useSelector(store=>store.post);
     const {posts} = useSelector(store=>store.post);
     const [postComments, setPostComments] = useState([]);
@@ -70,7 +71,7 @@ const CommentDialog = ({ open, setOpen }) => {
                     <div className='w-1/2 flex flex-col justify-between'>
                         <div className='flex items-center justify-between m-3'>
                             <div className='flex gap-3 items-center'>
-                                <Link>
+                                <Link to={`/profile/${user?._id}`}>
                                     <Avatar>
                                         <AvatarImage src={selectedPost?.author?.profilePicture}/>
                                         <AvatarFallback>CN</AvatarFallback>

@@ -9,6 +9,7 @@ import MainLayout from "./components/MainLayout";
 import HomePage from "./pages/HomePage";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/account/edit" element={<EditProfile />} />
+            <Route path="/chat" element={<ChatPage />} />
           </Route>
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />

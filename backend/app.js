@@ -8,6 +8,9 @@ import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import { app, server } from './socketio/socket.js';
+import path from 'path';
+
+const __dirname = path.resolve();
 
 app.use(express.json());
 app.use(cookieParser());
@@ -21,6 +24,12 @@ app.use(cors(corsOption));
 app.use('/api/user', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/messages', messageRoutes);
+
+app.use(express.static(path.join(__dirname, '/frontend/dist')));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
+//npm run build npm run start
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

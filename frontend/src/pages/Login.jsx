@@ -5,14 +5,15 @@ import { setUser } from '@/redux/authSlice';
 import { USER_API_ENDPOINT } from '@/utils/ApiEndPoints';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const {user} = useSelector(store=>store.auth);
 
     const [input, setInput] = useState({
         email: "",
@@ -51,6 +52,12 @@ const Login = () => {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        if(user){
+            navigate('/');
+        }
+    },[]);
 
     return (
         <div className='flex items-center justify-center h-screen w-screen bg-blue-50'>

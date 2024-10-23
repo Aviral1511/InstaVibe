@@ -16,7 +16,7 @@ const RightSidebar = () => {
           </Avatar>
         </Link>
         <div className=''>
-          <h1 className='font-semibold text-sm'><Link to={`/profile/${user?._id}`}>{user.username}</Link> </h1>
+          <h1 className='font-semibold text-sm'><Link to={`/profile/${user?._id}`}>{user?.username}</Link> </h1>
           <span className='text-sm text-gray-600'>{user?.bio || 'Bio here...'}</span>
         </div>
       </div>

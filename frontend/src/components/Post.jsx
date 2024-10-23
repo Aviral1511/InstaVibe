@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
-import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
+import { Bookmark, BookmarkCheck, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import { Button } from './ui/button'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
 import CommentDialog from './CommentDialog'
@@ -92,6 +92,18 @@ const Post = ({post}) => {
         }
     }
 
+    const bookMarkHandler = async () => {
+        try {
+            const res = await axios.get(`${POST_API_ENDPOINT}/${post._id}/bookmark`, {withCredentials:true});
+            if(res.data.success){
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.response.success.message);
+        }
+    }
+
     return (
         <div className='p-2 my-8 w-full max-w-sm mx-auto border border-gray-200 rounded-lg'>
             <div className="flex justify-between items-center">
@@ -110,7 +122,9 @@ const Post = ({post}) => {
                         <MoreHorizontal className='cursor-pointer' />
                     </DialogTrigger>
                     <DialogContent className='flex flex-col items-center text-sm text-center'>
-                        <Button variant='ghost' className='cursor-pointer w-fit hover:text-red-500 text-[#ED4956] font-bold'>Unfollow</Button>
+                        {
+                            post?.author?._id !== user?._id && <Button variant='ghost' className='cursor-pointer w-fit hover:text-red-500 text-[#ED4956] font-bold'>Unfollow</Button>
+                        }
                         <Button variant='ghost' className='cursor-pointer w-fit '>Add to favouraites</Button>
                         {
                             user  && user?._id === post?.author?._id && <Button onClick={deletePostHandler} variant='ghost' className='cursor-pointer w-fit'>Delete</Button>
@@ -128,7 +142,8 @@ const Post = ({post}) => {
                     <MessageCircle onClick={() => {dispatch(setSelectedPost(post)); setOpen(true)}} className='cursor-pointer hover:text-gray-600' />
                     <Send className='cursor-pointer hover:text-gray-600' />
                 </div>
-                <Bookmark className='cursor-pointer hover:text-gray-600' />
+                <Bookmark onClick={bookMarkHandler} className='cursor-pointer hover:text-gray-600' />
+                {/* <BookmarkCheck /> */}
             </div>
             <span className='font-normal block mb-2'>{postLike} likes</span>
             <p>

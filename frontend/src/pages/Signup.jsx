@@ -4,12 +4,14 @@ import { Label } from '@/components/ui/label'
 import { USER_API_ENDPOINT } from '@/utils/ApiEndPoints';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Signup = () => {
     const navigate = useNavigate();
+    const {user} = useSelector(store=>store.auth);
 
     const [input, setInput] = useState({
         username: "",
@@ -49,6 +51,12 @@ const Signup = () => {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        if(user){
+            navigate('/');
+        }
+    },[]);
 
     return (
         <div className='flex items-center justify-center h-screen w-screen bg-blue-50'>
